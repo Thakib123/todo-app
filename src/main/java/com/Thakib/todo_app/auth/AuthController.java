@@ -2,7 +2,7 @@ package com.Thakib.todo_app.auth;
 
 import org.springframework.web.bind.annotation.*;
 
-// Endpoints for registering and (soon) logging in. All start with /api/auth
+// Endpoints for registering and logging in. All start with /api/auth
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -18,4 +18,10 @@ public class AuthController {
     public String register(@RequestBody AuthRequest request) {
         return authService.register(request);
     }
+    // POST /api/auth/login = verify credentials, get a token back
+    @PostMapping("/login")
+    public String login(@RequestBody AuthRequest request) {
+        return authService.login(request);
+    }
+
 }
