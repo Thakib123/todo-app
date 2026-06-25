@@ -1,6 +1,7 @@
 # Todo REST API
 
 ![CI Build](https://github.com/Thakib123/todo-app/actions/workflows/ci.yml/badge.svg)
+![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen)
 
 A secure RESTful Todo API built with Spring Boot, featuring JWT authentication.
 
@@ -38,6 +39,11 @@ A secure RESTful Todo API built with Spring Boot, featuring JWT authentication.
 - `POST /api/todos` — create a todo
 - `PUT /api/todos/{id}` — update a todo
 - `DELETE /api/todos/{id}` — delete a todo
+
+## Development & Automation
+- **Continuous Integration:** GitHub Actions builds and tests every push
+- **Dependency Management:** Dependabot automatically opens PRs for dependency updates
+- **Build Status:** See the badge at the top of this README
 
 ## Authentication
 Include your token in the Authorization header:
