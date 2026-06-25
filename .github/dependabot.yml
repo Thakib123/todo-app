@@ -1,0 +1,16 @@
+# Dependabot configuration
+version: 2
+
+updates:
+  # Keep Maven dependencies up to date
+  - package-ecosystem: "maven"
+    directory: "/"                 # location of your pom.xml (root)
+    schedule:
+      interval: "weekly"           # check once a week
+    open-pull-requests-limit: 5    # don't open more than 5 PRs at once
+
+  # Also keep GitHub Actions versions up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
