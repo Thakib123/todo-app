@@ -27,25 +27,49 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // 1. Look for the "Authorization" header
+        // Look for the "Authorization" header on the incoming request
         String authHeader = request.getHeader("Authorization");
 
-        // 2. If it exists and starts with "Bearer ", pull out the token part
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // chop off "Bearer "
+        // DEBUG: confirms the filter is actually running, and for which URL.
+        // If this line never shows in the logs, the filter isn't being hit at all.
+        System.out.println(">>> JWT FILTER hit for: " + request.getMethod() + " " + request.getRequestURI());
 
-            // 3. If the token is valid, tell Spring this user is authenticated
-            if (jwtUtil.isTokenValid(token)) {
+        // DEBUG: shows exactly what came in the Authorization header.
+        // If this prints "null", the token isn't being sent by the client (Postman) at all.
+        System.out.println(">>> Authorization header: " + authHeader);
+
+        // Only proceed if the header exists and is in the expected "Bearer <token>" format
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7); // chop off the "Bearer " prefix to get the raw token
+
+            // Check whether the token is correctly signed and not expired
+            boolean valid = jwtUtil.isTokenValid(token);
+
+            // DEBUG: tells us if validation passed or failed.
+            // "false" here means the token was rejected — likely a signing/parsing issue on this environment.
+            System.out.println(">>> Token valid? " + valid);
+
+            if (valid) {
+                // Pull the username out of the token so Spring knows who this is
                 String username = jwtUtil.extractUsername(token);
 
+                // DEBUG: confirms we successfully read the user and are about to authenticate them.
+                // If we reach here but still get a 403, the problem is AFTER the filter.
+                System.out.println(">>> Authenticated user: " + username);
+
+                // Tell Spring Security this request belongs to an authenticated user
                 var authentication = new UsernamePasswordAuthenticationToken(
                         username, null, Collections.emptyList());
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } else {
+            // DEBUG: the header was missing or didn't start with "Bearer ".
+            // Points to a client-side/token-sending problem rather than a validation problem.
+            System.out.println(">>> No valid Bearer header present");
         }
 
-        // 4. Always continue the chain (whether authenticated or not)
+        // Always continue the chain — authenticated or not.
+        // (If not authenticated, the security rules will reject protected routes with 403.)
         filterChain.doFilter(request, response);
     }
 }
